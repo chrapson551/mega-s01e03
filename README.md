@@ -22,7 +22,7 @@ With Node 22, run `node --experimental-strip-types analyze.mjs`, then `node prep
 
 ## Publication and course review
 
-Repository publication and course-requested corrections were approved by the account owner. Course acceptance is pending; publication alone does not complete the challenge. The initial five-report issue is closed as a duplicate of the parser issue; its evidence is retained in that issue and the KB.
+The course accepted the challenge on 12 November 2026. See `course-result.json` for the outcome and the [saved debrief](https://hq.mega.dev/challenges/what-it-shows#debrief). The initial five-report issue is closed as a duplicate of the parser issue; its evidence is retained in that issue and the KB.
 
 The course's engineering update marks #4471 closed on 05 Oct: parser fixed, hint won't fix because booking-v3 was retired. The corresponding repository issues are closed with those distinct outcomes. This does not establish that both bugs received a code fix.
 

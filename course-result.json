@@ -1,0 +1,9 @@
+{
+  "status": "solved",
+  "solvedAt": "2026-11-12T14:51:33.000Z",
+  "repo": "chrapson551/mega-s01e03",
+  "parser": { "reports": 379, "issue": 1, "outcome": "fixed", "closure": "completed" },
+  "hint": { "reports": 33, "issue": 2, "outcome": "won't fix: booking-v3 form retired", "closure": "not planned" },
+  "duplicateIssue": 3,
+  "debrief": "https://hq.mega.dev/challenges/what-it-shows#debrief"
+}
