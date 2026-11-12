@@ -2,7 +2,7 @@
 layout: runbook
 title: '#4471 reviewed: separate date failures before merging'
 owner: support desk
-status: proposed
+status: closed
 reviewed: '2026-11-12'
 signature: 'v1.eyJzdWIiOiI0MzMyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTQ0OTMyNjksImV4cCI6MTc5NDU3OTY2OX0.iCPuBZSiHSiZl19lS4baE67iTZv76Kp3cLTDWkPsepE'
 ---
@@ -15,6 +15,12 @@ signature: 'v1.eyJzdWIiOiI0MzMyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpY
 
 This review corrects the claim in [the original incident](/kb/incidents/4471) that one fix covers every report. It uses the 4 October 2026 export; it does not establish that the live queue is unchanged.
 
+## Engineering update: closed with different outcomes
+
+The [course's engineering update](https://hq.mega.dev/challenges/what-it-shows) now marks #4471 closed on 05 Oct. The parser is **fixed**, with `fix(dates): parse dd/mm for eu locales`. The booking-v3 hint is **won't fix** because the booking-v3 form was retired. Closure does not mean both bugs were fixed: the second path was retired. The report counts below remain the historical export's coverage.
+
+Our [parser ticket](https://github.com/chrapson551/mega-s01e03/issues/1) is completed. Our [hint ticket](https://github.com/chrapson551/mega-s01e03/issues/2) is closed as not planned, with the retirement reason retained.
+
 ## Coverage
 
 <ReviewedCauses />
@@ -23,7 +29,7 @@ This review corrects the claim in [the original incident](/kb/incidents/4471) th
 
 The shared parser reads month first even for tenants who write day first. R-41200 describes 7 April becoming 4 July. Resolve the tenant from the directory; the reporter's browser locale and intake tag are guesses, not authoritative settings.
 
-The booking-v3 form prints MM/DD/YYYY, but reads the input according to the tenant locale. A day-first tenant following that hint supplies a month-first date that the form misreads. Copper Studio, Alder Physio, and Pale Harbour run this version. Changing only the shared parser does not correct the hint.
+In the export, the booking-v3 form prints MM/DD/YYYY, but reads the input according to the tenant locale. A day-first tenant following that hint supplies a month-first date that the form misreads. Copper Studio, Alder Physio, and Pale Harbour ran this version. Changing only the shared parser would not correct the hint; engineering instead retired booking-v3.
 
 The five flagged reports describe unusual symptoms: one-day shifts, a date that differs between Lisbon and Toronto, and an invite reportedly arriving before booking. They remain part of the parser ticket under the supplied tenant-and-channel classification. Record them as diagnostic notes and obtain original input, invite payloads, and dispatch logs. These symptoms alone do not establish a third problem or prove a timezone, daylight-saving, or dispatch defect.
 
@@ -43,6 +49,6 @@ The rendered triage explorer contradicts its surrounding rule: two Alder Physio 
 
 ## Sources and limits
 
-Sources: reports-4471.json, all tenant files, desk-notes.json, causes.ts, locales.ts, CauseTable.svelte, QueueTimeline.svelte, and decision 0001. The numbers above are computed from those files at render time. The booking application and dispatch logs are absent, so reproduction steps in the draft issues require engineering verification. The public repository will contain the issue coverage lists and this page's source and rendered HTML.
+Sources: reports-4471.json, all tenant files, desk-notes.json, causes.ts, locales.ts, CauseTable.svelte, QueueTimeline.svelte, and decision 0001. Engineering outcomes come from the course page and are recorded in desk-update.json. The numbers above are computed from those files at render time. The booking application and dispatch logs are absent, so reproduction steps in the issue bodies require engineering verification. The public repository contains the issue coverage lists and this page's source and rendered HTML.
 
 <RenderStamp {signature} />

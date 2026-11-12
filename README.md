@@ -24,6 +24,8 @@ With Node 22, run `node --experimental-strip-types analyze.mjs`, then `node prep
 
 Repository publication and course-requested corrections were approved by the account owner. Course acceptance is pending; publication alone does not complete the challenge. The initial five-report issue is closed as a duplicate of the parser issue; its evidence is retained in that issue and the KB.
 
+The course's engineering update marks #4471 closed on 05 Oct: parser fixed, hint won't fix because booking-v3 was retired. The corresponding repository issues are closed with those distinct outcomes. This does not establish that both bugs received a code fix.
+
 Build and local verification passed. Browser checks confirmed the rendered signature, report counts, working links, stale triage warning, and a mobile layout without horizontal overflow. The standalone page has three embedded stylesheets, no scripts, and no browser console errors. Local logs and state in `.private/`, dependencies, and temporary Svelte build internals are ignored and must not be published. The course explicitly requires its issued proof as the signed page's frontmatter value; it is included there intentionally.
 
 The repository preserves the original accepted decision as history and adds a proposed replacement. Reproduction is required before any unusual symptom is classified as an additional problem.
