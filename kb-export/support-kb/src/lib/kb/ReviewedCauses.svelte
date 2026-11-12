@@ -6,19 +6,18 @@
   const merged = uniqueById(reports as Report[]).filter(r => r.mergedInto === 4471);
   const review = new Set(notes.oneDayMove);
   const groups = [
-    { label: 'Shared parser', rows: merged.filter(r => !review.has(r.id) && causeOf(r, tenantOf(r)) === 'parser') },
-    { label: 'booking-v3 hint', rows: merged.filter(r => !review.has(r.id) && causeOf(r, tenantOf(r)) === 'hint') },
-    { label: 'Anomalous dates: investigation, cause unconfirmed', rows: merged.filter(r => review.has(r.id)) }
+    { label: 'Shared parser', rows: merged.filter(r => causeOf(r, tenantOf(r)) === 'parser') },
+    { label: 'booking-v3 hint', rows: merged.filter(r => causeOf(r, tenantOf(r)) === 'hint') }
   ];
 </script>
 
 <p>{reports.length} export rows; {merged.length} unique reports in #4471. Deduplicate by ID before counting.</p>
 <table>
-  <thead><tr><th>Problem / investigation</th><th>Unique reports</th></tr></thead>
+  <thead><tr><th>Problem</th><th>Unique reports</th></tr></thead>
   <tbody>{#each groups as group}<tr><td>{group.label}</td><td>{group.rows.length}</td></tr>{/each}</tbody>
 </table>
-<p>The original tenant classifier places {groups[0].rows.length + groups[2].rows.length} reports under parser. The investigation group is excluded from confirmed parser coverage here.</p>
+<p>{merged.filter(r => review.has(r.id)).length} reports have unusual symptoms flagged by the desk. They are included in parser coverage and retained below as diagnostic notes.</p>
 <details>
-  <summary>Read the anomalous reports before merging them</summary>
-  <ul>{#each groups[2].rows as r}<li><code>{r.id}</code>: {r.body}</li>{/each}</ul>
+  <summary>Diagnostic notes within the parser ticket</summary>
+  <ul>{#each merged.filter(r => review.has(r.id)) as r}<li><code>{r.id}</code>: {r.body}</li>{/each}</ul>
 </details>

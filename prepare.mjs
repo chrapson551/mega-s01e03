@@ -2,22 +2,17 @@ import fs from 'node:fs';
 const base = new URL('./', import.meta.url);
 const summary = JSON.parse(fs.readFileSync(new URL('analysis.json', base), 'utf8'));
 const ambiguous = summary.groups.flatMap(g => g.oneDayReports);
-const ambiguousIds = new Set(ambiguous.map(r => r.id));
-const parser = summary.groups.find(g => g.cause === 'parser').reportIds.filter(id => !ambiguousIds.has(id));
+const parser = summary.groups.find(g => g.cause === 'parser').reportIds;
 const hint = summary.groups.find(g => g.cause === 'hint').reportIds;
 const definitions = [
   { key: 'parser', title: 'Shared parser treats day-first tenant dates as month-first', ids: parser,
-    description: 'The shared parser interprets dates as MM/DD even when the tenant uses day-first dates. This swaps month and day, for example 7 April becomes 4 July (R-41200). Resolve the tenant locale from the tenant directory, rather than the reporter browser locale or intake tag. The audited count excludes five anomalous reports that the existing classifier assigns here without evidence of a month/day swap.',
-    reproduction: 'For Harbour Dental (en-GB, booking-v2), enter 07/04/2026 through the affected app flow. Expected: 7 April 2026. Observed in R-41200: 4 July.',
+    description: 'The shared parser interprets dates as MM/DD even when the tenant uses day-first dates. This swaps month and day, for example 7 April becomes 4 July (R-41200). Resolve the tenant locale from the tenant directory, rather than the reporter browser locale or intake tag. Coverage follows the supplied causeOf rule: 379 unique reports, including five flagged by desk-notes.json. Those unusual symptoms remain diagnostic notes within this ticket; they do not establish a separate problem.',
+    reproduction: 'For Harbour Dental (en-GB, booking-v2), enter 07/04/2026 through the affected app flow. Expected: 7 April 2026. Observed in R-41200: 4 July.\n\nDiagnostic follow-up for the five flagged reports (included in this count):\n\n' + ambiguous.map(r => `${r.id}: ${r.body}`).join('\n\n') + '\n\nCheck original dates, invite payloads, tenant settings, and dispatch logs before inferring any additional cause. No timezone or dispatch defect is established by these symptoms alone.',
     acceptance: 'Parse according to the explicit tenant date convention or accept an unambiguous typed date. Verify app, email, and booking-v2 paths; check all tenant locales using Intl date parts. Preserve month-first tenant behavior. Count each report ID once.' },
   { key: 'hint', title: 'booking-v3 prints MM/DD/YYYY for forms that read day-first dates', ids: hint,
     description: 'booking-v3 prints MM/DD/YYYY, but the form interprets input using the day-first tenant locale. Following the hint produces the wrong date. This affects form reports from Copper Studio (es-ES), Alder Physio (de-DE), and Pale Harbour (pt-PT). It is a distinct input-hint bug and requires its own fix even after the shared parser is corrected.',
     reproduction: 'For Copper Studio, select booking-v3. Following the MM/DD/YYYY hint, type 01/06/2026 for January 6. The day-first form reads June 1, matching R-41230. This is a reproduction derived from the documented form behavior; the export contains no running booking application.',
-    acceptance: 'Make the displayed hint and date interpretation agree with the tenant locale. Test all three affected tenants and both form versions. Confirm the shared parser change alone does not leave a misleading booking-v3 hint.' },
-  { key: 'one-day-investigation', title: 'Investigate five anomalous date reports merged into parser ticket #4471', ids: ambiguous.map(r => r.id),
-    description: 'These reports describe one-day shifts, a timezone-dependent date, or an invite arriving before booking, rather than a demonstrated month/day swap. desk-notes.json flags all five. The tenant-based classifier currently files them under parser anyway. Keep them in a separate investigation; timezone, DST, scheduling, and clock behavior are hypotheses, not established causes. The five reports may need further splitting after reproduction.',
-    reproduction: ambiguous.map(r => `${r.id}: ${r.body}`).join('\n\n'),
-    acceptance: 'Obtain original input, expected/actual date and time, tenant/user timezone, generated invite, and dispatch logs for each report. Reproduce before naming a root cause. Separate further if evidence shows different failures; reconcile counts and report IDs when moving reports.' }
+    acceptance: 'Make the displayed hint and date interpretation agree with the tenant locale. Test all three affected tenants and both form versions. Confirm the shared parser change alone does not leave a misleading booking-v3 hint.' }
 ];
 fs.mkdirSync(new URL('draft-issues/', base), { recursive: true });
 for (const d of definitions) {

@@ -19,13 +19,13 @@ This review corrects the claim in [the original incident](/kb/incidents/4471) th
 
 <ReviewedCauses />
 
-## Two demonstrated mechanisms, plus an investigation
+## Two distinct problems
 
 The shared parser reads month first even for tenants who write day first. R-41200 describes 7 April becoming 4 July. Resolve the tenant from the directory; the reporter's browser locale and intake tag are guesses, not authoritative settings.
 
 The booking-v3 form prints MM/DD/YYYY, but reads the input according to the tenant locale. A day-first tenant following that hint supplies a month-first date that the form misreads. Copper Studio, Alder Physio, and Pale Harbour run this version. Changing only the shared parser does not correct the hint.
 
-The five flagged reports describe anomalies that the parser rule does not establish: explicit one-day shifts, a date that differs between Lisbon and Toronto, and an invite reportedly arriving before booking. Keep a separate investigation. Timezones, daylight saving, and dispatch timing need evidence; none is a proven root cause from this export. Split the investigation further if reproductions show different failures.
+The five flagged reports describe unusual symptoms: one-day shifts, a date that differs between Lisbon and Toronto, and an invite reportedly arriving before booking. They remain part of the parser ticket under the supplied tenant-and-channel classification. Record them as diagnostic notes and obtain original input, invite payloads, and dispatch logs. These symptoms alone do not establish a third problem or prove a timezone, daylight-saving, or dispatch defect.
 
 ## The queue kept moving
 
