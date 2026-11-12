@@ -1,0 +1,43 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { deskRef } from './kb-export/support-kb/src/lib/kb/desk-ref.ts';
+const root = new URL('./', import.meta.url);
+const read = p => fs.readFileSync(new URL(p, root), 'utf8');
+const reports = JSON.parse(read('kb-export/support-kb/src/lib/data/reports-4471.json'));
+const expectedIds = [...new Set(reports.filter(r => r.mergedInto === 4471).map(r => r.id))].sort();
+const manifest = JSON.parse(read('issue-manifest.json'));
+const assigned = manifest.flatMap(i => i.reportIds);
+assert.equal(assigned.length, new Set(assigned).size, 'A report was assigned twice');
+assert.deepEqual(assigned.sort(), expectedIds, 'Coverage differs from the source report IDs');
+for (const issue of manifest) assert.equal(issue.count, issue.reportIds.length);
+const page = read('kb-export/support-kb/src/routes/kb/incidents/4471-reviewed/+page.svx');
+const signature = page.match(/^signature: '([^']+)'/m)?.[1];
+assert.ok(signature, 'Page is unsigned');
+if (fs.existsSync(new URL('.private/course-state.json', root))) {
+  assert.equal(signature, JSON.parse(read('.private/course-state.json')).ticket, 'Signature differs from course proof');
+}
+const html = read('kb-export/support-kb/build/kb/incidents/4471-reviewed/index.html');
+assert.ok(html.includes(deskRef(signature)), 'Rendered signature is missing');
+assert.ok(!html.includes('no desk ref:'), 'Unsigned stamp rendered');
+for (const issue of manifest) assert.ok(html.includes(`<td>${issue.count}</td>`), `Rendered count missing: ${issue.key}`);
+for (const issue of manifest) assert.ok(read(`draft-issues/${issue.key}.md`).includes(`${issue.count} unique reports`));
+const index = read('kb-export/support-kb/build/kb/index.html');
+assert.ok(index.includes('/kb/incidents/4471-reviewed'), 'New page missing from KB index');
+assert.ok(index.includes('/kb/decisions/0002-dedupe-by-evidence'), 'New decision missing from KB index');
+assert.ok(read('kb-export/support-kb/build/kb/triage/dedupe/index.html').includes('Nobody has re-read this page'), 'Old triage stale warning absent');
+fs.mkdirSync(new URL('rendered/', root), {recursive:true});
+let standalone = html.replace(/<link\b[^>]*rel="stylesheet"[^>]*>/g, tag => {
+  const href = tag.match(/href="([^"]+)"/)?.[1];
+  assert.ok(href && !/^[a-z]+:/i.test(href), 'Stylesheet must be a local build artifact');
+  const css = new URL(href, new URL('kb-export/support-kb/build/kb/incidents/4471-reviewed/index.html', root));
+  return `<style>${fs.readFileSync(css, 'utf8')}</style>`;
+});
+standalone = standalone.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '').replace(/<link\b[^>]*rel="modulepreload"[^>]*>/g, '');
+standalone = standalone.replace(/href="(\/kb[^"?#]*)"/g, (_, href) => `href="../kb-export/support-kb/build${href.replace(/\/$/, '')}/index.html"`);
+assert.ok(standalone.includes('<style>'), 'Standalone page has no styles');
+assert.ok(!/rel="stylesheet"/.test(standalone), 'Standalone page depends on external styles');
+fs.writeFileSync(new URL('rendered/4471-reviewed.html', root), standalone);
+fs.writeFileSync(new URL('kb-export/support-kb/build/4471-reviewed.html', root), standalone.replaceAll('../kb-export/support-kb/build/kb', '/kb'));
+const result = {coverage: expectedIds.length, counts: Object.fromEntries(manifest.map(i => [i.key,i.count])), deskRef: deskRef(signature), buildPages: 6, status:'passed'};
+fs.writeFileSync(new URL('verification.json', root), JSON.stringify(result, null, 2)+'\n');
+console.log(JSON.stringify(result,null,2));

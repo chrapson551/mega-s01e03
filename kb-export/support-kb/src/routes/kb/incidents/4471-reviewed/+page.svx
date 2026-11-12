@@ -1,0 +1,48 @@
+---
+layout: runbook
+title: '#4471 reviewed: separate date failures before merging'
+owner: support desk
+status: proposed
+reviewed: '2026-11-12'
+signature: 'v1.eyJzdWIiOiI0MzMyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTQ0OTMyNjksImV4cCI6MTc5NDU3OTY2OX0.iCPuBZSiHSiZl19lS4baE67iTZv76Kp3cLTDWkPsepE'
+---
+
+<script>
+  import ReviewedCauses from '#lib/kb/ReviewedCauses.svelte';
+  import QueueTimeline from '#lib/kb/QueueTimeline.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+This review corrects the claim in [the original incident](/kb/incidents/4471) that one fix covers every report. It uses the 4 October 2026 export; it does not establish that the live queue is unchanged.
+
+## Coverage
+
+<ReviewedCauses />
+
+## Two demonstrated mechanisms, plus an investigation
+
+The shared parser reads month first even for tenants who write day first. R-41200 describes 7 April becoming 4 July. Resolve the tenant from the directory; the reporter's browser locale and intake tag are guesses, not authoritative settings.
+
+The booking-v3 form prints MM/DD/YYYY, but reads the input according to the tenant locale. A day-first tenant following that hint supplies a month-first date that the form misreads. Copper Studio, Alder Physio, and Pale Harbour run this version. Changing only the shared parser does not correct the hint.
+
+The five flagged reports describe anomalies that the parser rule does not establish: explicit one-day shifts, a date that differs between Lisbon and Toronto, and an invite reportedly arriving before booking. Keep a separate investigation. Timezones, daylight saving, and dispatch timing need evidence; none is a proven root cause from this export. Split the investigation further if reproductions show different failures.
+
+## The queue kept moving
+
+<QueueTimeline ticket={4471} />
+
+Received dates and merge dates measure different events. The bulk merge in July does not mean the failures began in July. New reports continue through the export cutoff. A queued fix and a known status do not show resolution.
+
+## Triage from now on
+
+Read the body, identify the product and tenant, check its locale and form version, and compare the actual failure mechanism. Merge only when that evidence matches. A similar subject can hide different bugs; different subjects can describe the same bug. Keep uncertain reports visible until investigated.
+
+The accepted [decision 0001](/kb/decisions/0001-dedupe-by-subject) is preserved as history. [Proposed decision 0002](/kb/decisions/0002-dedupe-by-evidence) replaces subject-only merging if adopted. The old triage page reflects that earlier policy, not a validated rule for this review. Review dates and stale warnings indicate when a page needs checking; they are not proof that its claims are correct.
+
+The rendered triage explorer contradicts its surrounding rule: two Alder Physio reports with the same subject have different causes when one arrives through the form and the other through the app. Its examples also show different subjects with the same cause, and identical subjects from an unknown tenant that must not be merged without investigation. The triage page was last reviewed in June 2024 and now shows a stale warning.
+
+## Sources and limits
+
+Sources: reports-4471.json, all tenant files, desk-notes.json, causes.ts, locales.ts, CauseTable.svelte, QueueTimeline.svelte, and decision 0001. The numbers above are computed from those files at render time. The booking application and dispatch logs are absent, so reproduction steps in the draft issues require engineering verification. The public repository will contain the issue coverage lists and this page's source and rendered HTML.
+
+<RenderStamp {signature} />

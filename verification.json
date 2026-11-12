@@ -1,0 +1,11 @@
+{
+  "coverage": 412,
+  "counts": {
+    "parser": 374,
+    "hint": 33,
+    "one-day-investigation": 5
+  },
+  "deskRef": "DR-03DS-WW8X",
+  "buildPages": 6,
+  "status": "passed"
+}

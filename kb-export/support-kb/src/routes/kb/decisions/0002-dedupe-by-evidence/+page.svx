@@ -1,0 +1,26 @@
+---
+layout: runbook
+title: '0002 · Propose deduplication by evidence and failure mechanism'
+owner: support desk
+status: proposed
+reviewed: '2026-11-12'
+signature: 'v1.eyJzdWIiOiI0MzMyIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTQ0OTMyNjksImV4cCI6MTc5NDU3OTY2OX0.iCPuBZSiHSiZl19lS4baE67iTZv76Kp3cLTDWkPsepE'
+---
+
+<script>
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+## Context
+
+[Incident #4471](/kb/incidents/4471-reviewed) contains different date failures under similar subjects. Subject-only matching concealed the booking-v3 hint problem and treated anomalous one-day reports as confirmed parser failures.
+
+## Proposed decision
+
+Replace decision 0001 upon approval. Read report bodies, resolve product and tenant settings, compare the path and expected/actual behavior, and merge only reports supported by a common failure mechanism. Subject normalization may suggest candidates, but cannot decide the merge. Deduplicate overlapping exports by report ID. Keep unknown causes separate and retain report-to-issue coverage.
+
+## Consequences
+
+Triage requires reading and investigation. Engineers receive counts with explicit scope and uncertainty. Update the triage runbook when this decision is accepted; preserve the accepted original decision as history.
+
+<RenderStamp {signature} />
